@@ -90,7 +90,6 @@ class PhysicsFormulaSolver(QWidget):
 
         layout.addStretch()
 
-        # Search bar (formula input)
         self.formula_input = QLineEdit()
         self.formula_input.setFont(QFont('Cascadia Mono', 16))
         self.formula_input.setPlaceholderText('_')
@@ -98,14 +97,12 @@ class PhysicsFormulaSolver(QWidget):
         self.formula_input.returnPressed.connect(self.solve_formula)
         layout.addWidget(self.formula_input)
 
-        # Add new shortcut for clearing variable memory (Ctrl+Q)
         self.clear_memory_action = QAction(self)
         self.clear_memory_action.setShortcut('Ctrl+Q')
         self.clear_memory_action.triggered.connect(self.clear_variable_memory)
         self.addAction(self.clear_memory_action)
 
 
-        # Results area
         self.results_area = QTextEdit()
         self.results_area.setFont(QFont('Cascadia Mono', 14))
         self.results_area.setReadOnly(True)
@@ -118,33 +115,26 @@ class PhysicsFormulaSolver(QWidget):
 
         self.setLayout(layout)
 
-        # Physics constants dictionary
         self.constant_list = {name: (name, getattr(constants, name)) for name in dir(constants) if isinstance(getattr(constants, name), float)}
 
-        # Adding Euler's number explicitly
-        # Adding Euler's number explicitly using sympy's E
         self.constant_list['euler'] = ('euler', float(math.e))
 
-        # Fullscreen shortcut
         self.fullscreen_action = QAction(self)
         self.fullscreen_action.setShortcut('F11')
         self.fullscreen_action.triggered.connect(self.toggle_fullscreen)
         self.addAction(self.fullscreen_action)
 
-        # Escape shortcut to close the program
         self.close_action = QAction(self)
         self.close_action.setShortcut(QKeySequence(Qt.Key.Key_Escape))  # Bind Escape key
         self.close_action.triggered.connect(self.close)
         self.addAction(self.close_action)
 
 
-        # Shortcut for opening settings (Ctrl + I)
         self.settings_action = QAction(self)
         self.settings_action.setShortcut('Ctrl+I')
         self.settings_action.triggered.connect(self.show_settings)
         self.addAction(self.settings_action)
 
-        # Variable memory display
         self.memory_label = QLabel("Memory:")
         self.memory_label.setStyleSheet("color: #4D4D4D; padding-left: 20px;")  # Add left padding
         self.memory_label.setFont(QFont('Cascadia Mono', 14))
@@ -158,20 +148,17 @@ class PhysicsFormulaSolver(QWidget):
         layout.addWidget(self.memory_label)
         layout.addWidget(self.memory_display)
 
-        # Shortcut for saving to variable memory (Ctrl+S)
         self.save_to_memory_action = QAction(self)
         self.save_to_memory_action.setShortcut('Ctrl+S')
         self.save_to_memory_action.triggered.connect(self.save_to_memory)
         self.addAction(self.save_to_memory_action)
 
 
-        # Shortcut for opening constant legend (Ctrl + O)
         self.legend_action = QAction(self)
         self.legend_action.setShortcut('Ctrl+O')
         self.legend_action.triggered.connect(self.show_legend)
         self.addAction(self.legend_action)
 
-        # Set focus to the input bar
         self.formula_input.setFocus()
 
     def save_to_memory(self):
@@ -180,26 +167,19 @@ class PhysicsFormulaSolver(QWidget):
 
         if current_solution:
             try:
-                # Determine the variable index (V1, V2, etc.)
                 var_index = len(self.variable_memory) + 1
                 var_name = f"V{var_index}"
                 
-                # Extract the numerical value (everything after the equals sign)
                 value = current_solution.split('=')[1].strip()
                 
-                # Try to convert to float to ensure it's a number
                 float(value)
                 
-                # Save the solution to the variable memory
                 self.variable_memory[var_name] = value
                 
-                # Debug print
                 print(f"Saved to memory: {var_name} = {value}")
                 
-                # Update the memory display
                 self.update_memory_display()
                 
-                # Inform the user
             except ValueError:
                 self.results_area.setText("Error: Unable to save. Make sure the result is a number.")
             except IndexError:
@@ -284,37 +264,29 @@ class PhysicsFormulaSolver(QWidget):
                    """)
             
     def update_memory_display(self):
-        # Display the current variable memory
         memory_text = "\n".join([f"{var}: {val}" for var, val in self.variable_memory.items()])
         self.memory_display.setText(memory_text)
 
     def solve_formula(self):
         formula = self.formula_input.text()
         try:
-            # Debug print
             print(f"Original formula: {formula}")
             print(f"Variable memory: {self.variable_memory}")
 
-            # Handle saved variables prefixed with backslash using regex
             for var, value in self.variable_memory.items():
                 formula = re.sub(r'\\' + var + r'\b', value, formula)
 
-            # Debug print
             print(f"Formula after variable substitution: {formula}")
 
-            # Handle constants prefixed with backslash using regex
             for symbol, (name, value) in self.constant_list.items():
                 formula = re.sub(r'\\' + name + r'\b', str(value), formula)
 
-            # Replace ^ with ** for exponentiation
             formula = formula.replace('^', '**')
 
             # Debug print
             print(f"Final formula for solving: {formula}")
 
-            # Check if the formula contains an equals sign
             if '=' not in formula:
-                # If no equals sign, add " a =" at the beginning
                 formula = " a = " + formula
                 print(f"Modified formula: {formula}")
 
@@ -346,7 +318,6 @@ class PhysicsFormulaSolver(QWidget):
 
         layout = QVBoxLayout()
 
-        # Search bar for the legend
         search_bar = QLineEdit()
         search_bar.setFont(QFont('Cascadia Mono', 12))
         search_bar.setPlaceholderText('')
@@ -411,7 +382,6 @@ class PhysicsFormulaSolver(QWidget):
 
         layout.addLayout(decimal_layout)
 
-        # Dark mode toggle combobox
         dark_mode_layout = QHBoxLayout()
         dark_mode_label = QLabel("Theme:")
         dark_mode_label.setFont(QFont('Cascadia Mono', 12))
